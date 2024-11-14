@@ -1,5 +1,8 @@
 package es.manolo.demo_jug.views;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.vaadin.voiceengine.VoiceEngine;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -7,10 +10,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import org.springframework.ai.chat.client.ChatClient;
-import org.vaadin.voiceengine.VoiceEngine;
 
-@Route("")
+@Route(value = "", layout = MainLayout.class)
 public class HomeView extends VerticalLayout {
     private TextField textField = new TextField();
     private Button button = new Button("Ask");
@@ -23,13 +24,16 @@ public class HomeView extends VerticalLayout {
         HorizontalLayout question = new HorizontalLayout(textField, button, voiceEngine);
         UI ui = UI.getCurrent();
         button.addClickListener(e -> {
+            textArea.clear();
             chatClient.prompt().user(textField.getValue()).stream().content().subscribe(token -> {
                 ui.access(() -> {
                     textArea.setValue(textArea.getValue() + token);
                 });
+            }, null, () -> {
+                ui.access(() -> {
+                    voiceEngine.play(textArea.getValue());
+                });
             });
-//            String content = chatClient.prompt().user(textField.getValue()).call().content();
-//            textArea.setValue(content);
         });
 
         voiceEngine.addEndListener(e -> {

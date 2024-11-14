@@ -14,4 +14,5 @@ public class DemoJugApplication implements AppShellConfigurator {
     public static void main(String[] args) {
         SpringApplication.run(DemoJugApplication.class, args);
     }
+
 }
